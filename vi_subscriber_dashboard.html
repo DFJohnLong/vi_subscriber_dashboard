@@ -1,0 +1,672 @@
+<script language=javascript runat=server>
+
+Platform.Load("core", "1");
+
+// All Subscribers
+var AllSubscribersCountsDE = DataExtension.Init("AllSubscribersCounts");
+var AllSubscribersCounts = AllSubscribersCountsDE.Rows.Lookup(["Filter"], [true], 1, "CreatedDate DESC");
+var AS_ALL = AllSubscribersCounts[0]["AllSubsCount"];
+var AS_AC = AllSubscribersCounts[0]["ActiveCount"];
+var AS_UC = AllSubscribersCounts[0]["UnsubCount"];
+var AS_BC = AllSubscribersCounts[0]["BouncedCount"];
+var AS_HC = AllSubscribersCounts[0]["HeldCount"];
+
+var MasterStoreDataDE = DataExtension.Init("MasterStoreData");
+var MasterStoreDataCount = MasterStoreDataDE.Rows.Lookup(["Active"], [true]);
+var msdCount = MasterStoreDataCount.length;
+
+
+var FavoriteLocationCountsDateDE = DataExtension.Init("FavoriteLocationCounts");
+var FavoriteLocationCountsDate = FavoriteLocationCountsDateDE.Rows.Lookup(["Filter"], ["True"], 1, "CreatedDate DESC");
+var filterDate = FavoriteLocationCountsDate[0]["CreatedDate"];
+
+
+var FavoriteLocationCountsDE = DataExtension.Init("FavoriteLocationCounts");
+var FavoriteLocationCounts = FavoriteLocationCountsDE.Rows.Lookup(["CreatedDate"], [filterDate], msdCount, "State ASC, City ASC, Address ASC");
+
+
+/*
+// Corporate All Subscribers
+var AllSubscribersCountsCorporateDE = DataExtension.Init("AllSubscribersCountsCorporate");
+var AllSubscribersCountsCorporate = AllSubscribersCountsCorporateDE.Rows.Retrieve();
+var ASC_ALL = AllSubscribersCountsCorporate[0]["AllSubsCount"];
+var ASC_AC = AllSubscribersCountsCorporate[0]["ActiveCount"];
+var ASC_UC = AllSubscribersCountsCorporate[0]["UnsubCount"];
+var ASC_BC = AllSubscribersCountsCorporate[0]["BouncedCount"];
+var ASC_HC = AllSubscribersCountsCorporate[0]["HeldCount"];
+
+
+// Franchise All Subscribers
+var AllSubscribersCountsFranchiseDE = DataExtension.Init("AllSubscribersCountsFranchise");
+var AllSubscribersCountsFranchise = AllSubscribersCountsFranchiseDE.Rows.Retrieve();
+var ASF_ALL = AllSubscribersCountsFranchise[0]["AllSubsCount"];
+var ASF_AC = AllSubscribersCountsFranchise[0]["ActiveCount"];
+var ASF_UC = AllSubscribersCountsFranchise[0]["UnsubCount"];
+var ASF_BC = AllSubscribersCountsFranchise[0]["BouncedCount"];
+var ASF_HC = AllSubscribersCountsFranchise[0]["HeldCount"];
+
+
+// Non Matching
+var NMFavoriteLocationTotalsDE = DataExtension.Init("NMFavoriteLocationTotals");
+var NMFavoriteLocationTotals = NMFavoriteLocationTotalsDE.Rows.Retrieve();
+var NM_ALL = NMFavoriteLocationTotals[0]["AllSubsCount"];
+var NM_AC = NMFavoriteLocationTotals[0]["ActiveCount"];
+var NM_UC = NMFavoriteLocationTotals[0]["UnsubCount"];
+var NM_BC = NMFavoriteLocationTotals[0]["BouncedCount"];
+var NM_HC = NMFavoriteLocationTotals[0]["HeldCount"];
+*/
+</script>
+
+<!DOCTYPE html>
+<html lang="en" style="background-attachment: fixed;">
+<head>
+
+	<!-- Basic Page Needs
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+	<meta charset="utf-8">
+	<title>Village Inn Subscribers Dashboard</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<!-- Mobile Specific Metas
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+	<!-- FONT
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+	<link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+	<link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
+
+	<!-- CSS
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+	<link rel="stylesheet" href="http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/normalize.css">
+	<link rel="stylesheet" href="http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/skeleton.css">
+
+	<!-- Favicon
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+	<link rel="icon" type="image/png" href="http://www.villageinn.com/favicon.ico">
+
+	<!-- FontAwesome
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+	<!-- CHARTIST.JS
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+	<link rel="stylesheet" href="http://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+	<script src="http://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+
+	<!-- FooTable
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+	<link href="http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/footable.core.css" rel="stylesheet" type="text/css" />
+	<link href="http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/footable.metro.css" rel="stylesheet" type="text/css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+	<script src="http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/footable.js" type="text/javascript"></script>
+	<script src="http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/footable.sort.js" type="text/javascript"></script>
+	<script src="http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/footable.filter.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		$(function () {
+			$('.footable').footable();
+		});
+	</script>
+
+	<style>
+
+	/*-- Basic Styles
+	–––––––––––––––––––––––––––––––––––––––––––––––––– --*/
+
+	html {
+		height: 100%;
+		background-color: #FFF4C9;
+		background-size: cover;
+		background-attachment: fixed;
+	}
+
+	body {
+		font-size: 1.2em !important;
+	}
+
+	h1, h2, h3, h4, h5 {
+		color: #ED5E11;
+	}
+
+	h1 {
+		font-size: 4rem;
+	}
+
+	h2 {
+		font-size: 3rem;
+	}
+
+	h3 {
+		font-size: 2rem;
+	}
+
+	h4 {
+		font-size: 1rem;
+	}
+
+	.hdr {
+		font-weight: bold;
+	}
+
+	.break {
+		word-wrap: break-word;
+	}
+
+
+
+	/*-- Page Styles
+	–––––––––––––––––––––––––––––––––––––––––––––––––– --*/
+
+	#header, #content, #footer {
+		width: 100%;
+	}
+
+	#header {
+		height: 103px;
+		background: url(http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/vi_header_bg.gif) top repeat-x #ed5e11;
+	}
+
+	.header {
+		padding: 15px 0;
+	}
+
+	h1, h2, h3, h4, h5 {
+		font-family: 'Oswald', sans-serif;
+		font-weight: 400;
+	}
+
+	#content {
+		height: 100%;
+		padding-top: 30px;
+	}
+
+	.container {
+		padding: 0 !important;
+	}
+
+	.horzborder {
+		max-width: 960px;
+		height: 23px;
+		background: url(http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/vi_lp_giftcardpromo_stripehorzborder.gif) center repeat-x;
+		margin: auto;
+	}
+
+	.bodybox {
+		max-width: 600px;
+		margin: auto;
+		margin-top: 15px;
+		margin-bottom: 30px;
+		padding: 15px 10px;
+		background-color: #ffffff;
+		-webkit-border-radius: 10px;
+		-moz-border-radius: 10px;
+		border-radius: 10px;
+		border: 5px dashed #ACE0EE;
+	}
+
+	.mobonlineimg {
+		display: none;
+	}
+
+	.bodybox h1, h2, h3, h4, h5 {
+		color: #ED5E11;
+	}
+
+	.fiftypercent {
+	  width: 50%;
+	}
+
+	.nomargin {
+		margin: 0;
+	}
+
+	.autowidth {
+	  width: auto;
+	}
+
+	.heading {
+		text-align: center;
+	}
+	.deskhdr {
+		margin: auto;
+		display: block;
+	}
+
+	.hdrimg {
+		width: 530px;
+		display: block;
+		margin: auto;
+	}
+
+	.sechdr {
+		padding-top: 15px;
+	}
+
+	.rowbuy {
+		max-width: 395px;
+		padding-top: 20px;
+	}
+
+	.buydiv {
+		padding-top: 17px;
+	}
+
+	.rowget {
+		max-width: 401px; padding-top: 15px;
+	}
+
+	.hdrparts {
+		padding: 0;
+
+	}
+
+	.center {
+		margin: auto;
+	}
+
+	.percent {
+		text-align: center;
+	}
+
+	.percent h1 {
+		font-size: 7rem;
+		font-weight: 700;
+		margin: 0;
+	}
+
+	.percent h1 .perclight {
+		font-weight: 300;
+	}
+
+	.incentive {
+		text-align: center;
+		padding-top: 20px;
+	}
+
+	.incentive .check {
+		color: #555555;
+		font-family: Helvetica;
+		font-size: 3rem;
+		font-weight: 400;
+		line-height: 3.5rem;
+	}
+
+	.expiration {
+		font-family: Helvetica, Arial, sans-serif;
+		text-align: center;
+	}
+
+	.light {
+		color: #555555;
+		font-family: 'Oswald', sans-serif;
+		font-size: 2rem;
+		font-weight: 300;
+		line-height: 3.5rem;
+	}
+
+	.couponcontainer {
+		max-width: 200px;
+		margin: 15px 0;
+		margin: 30px auto;
+		padding: 0 15px;
+	}
+
+	.couponcontainer img {
+		width: 100%;
+	}
+
+	p.disclaimer {
+		max-width: 500px;
+		margin: 30px auto;
+		font-size: 12px;
+		font-style: italic;
+		color: #555555;
+	}
+
+
+
+	/*-- Footable Styles
+	–––––––––––––––––––––––––––––––––––––––––––––––––– --*/
+	.footable > thead > tr > th,
+	.footable > thead > tr > td {
+	background-color: #ED5E11;
+	border: 1px solid #ED5E11;
+	color: #ffffff;
+	border-top: none;
+	border-left: none;
+	font-weight: normal;
+	}
+
+
+
+	/*-- Footer Styles
+	–––––––––––––––––––––––––––––––––––––––––––––––––– --*/
+	#footer {
+		background-color: #FAD36E;
+	}
+
+
+
+	/*-- Pie Chart Custom Styles
+	–––––––––––––––––––––––––––––––––––––––––––––––––– --*/
+
+	.divpieleg {
+		padding-top: 40px;
+	}
+
+	table.tablepieleg th, table.tablepieleg td {
+		padding-top: 0px !important;
+		padding-bottom: 0px !important;
+		border-bottom: none !important;
+	}
+
+	.column, .columns {
+		margin-left: 2% !important;
+	}
+
+	.ct-slice-donut {
+		stroke-width: 30px !important;
+	}
+
+	.ct-series-a .ct-bar, .ct-series-a .ct-line, .ct-series-a .ct-point, .ct-series-a .ct-slice-donut {
+		stroke: #349A1A !important;
+	}
+	.square-a { width: 10px; height: 10px; background: #349A1A;
+	}
+
+	.ct-series-b .ct-bar, .ct-series-b .ct-line, .ct-series-b .ct-point, .ct-series-b .ct-slice-donut {
+		stroke: #DA2000 !important;
+	}
+
+	.square-b { width: 10px; height: 10px; background: #DA2000;
+	}
+
+	.ct-series-c .ct-bar, .ct-series-c .ct-line, .ct-series-c .ct-point, .ct-series-c .ct-slice-donut {
+		stroke: #FBC800 !important;
+	}
+
+	.square-c { width: 10px; height: 10px; background: #FBC800
+	}
+
+	.ct-series-d .ct-bar, .ct-series-d .ct-line, .ct-series-d .ct-point, .ct-series-d .ct-slice-donut {
+		stroke: #959595 !important;
+	}
+
+	.square-d { width: 10px; height: 10px; background: #959595; }
+
+	.square-a, .square-b, .square-c, .square-d {
+		margin-bottom: 3px;
+	}
+
+	.pietotal {
+		width: 100%;
+		text-align: center;
+		position: absolute;
+		line-height: 16px;
+		top: 50%;
+		-ms-transform: translateY(-50%); /* IE 9 */
+		-webkit-transform: translateY(-50%); /* Safari */
+		transform: translateY(-50%);
+	}
+
+
+
+		/*-- Mobile Styles
+		–––––––––––––––––––––––––––––––––––––––––––––––––– --*/
+		/* For devices larger than 8800px */
+		@media screen and (max-width: 880px) {
+			.bodybox {
+			  background-image: none !important;
+			  position: relative;
+			}
+
+			.sechdr .columns {
+				text-align: center !important;
+				width: 100% !important;
+			}
+
+			.mobonlineimg {
+				display: block !important;
+				position: absolute;
+				top: 109px;
+				left: 0px;
+				width: 90px !important;
+			}
+		}
+
+		/* For devices larger than 550px */
+		@media screen and (max-width: 550px) {
+			html {
+				background-size: auto !important;
+			}
+
+			#header .row .columns {
+				float: none !important;
+				text-align: center !important;
+			}
+
+			.hide {
+				display: none !important;
+			}
+
+			.mobcenter {
+				width: 100% !important;
+				max-width: 400px !important;
+				text-align: center !important;
+			}
+
+			.onehundred {
+				width: 100%;
+				height: auto;
+			}
+
+			.logo {
+				margin: auto !important;
+			}
+
+			.deskhdr {
+				display: none !important;
+			}
+
+			.mobhdr {
+				display: block !important;
+			}
+
+			.rowbuy, .rowget {
+				padding: 5px 50px !important;
+			}
+
+			.bodybox {
+				position: relative;
+			}
+
+			.mobonlineimg {
+				display: block !important;
+				position: absolute;
+				top: 142px;
+				left: 0px;
+				width: 67px !important;
+			}
+
+			.buydiv {
+				padding-top: 0 !important;
+			}
+
+			.percent, .incentive {
+				text-align: center !important;
+			}
+
+			.sechdr .columns {
+				text-align: center !important;
+				width: 100% !important;
+			}
+
+			.horzborder {
+				width: 100% !important;
+			}
+
+			.couponoffer h1 {
+				margin: 0 !important;
+			}
+
+			.incentive {
+				padding-top: 0 !important;
+			}
+
+			.incentive h3 {
+				font-size: 2.5rem !important;
+			}
+
+			/* Mobile Pie Chart Styles */
+			p.disclaimer {
+				font-size: 10.5px !important;
+			}
+
+			.ct-chart-donut, .pietotal {
+				margin-left: -6px !important;
+			}
+
+			.divpieleg {
+				padding-top: 0 !important;
+				padding-left: 50% !important;
+			}
+
+			.tablepieleg {
+				margin-left: -45% !important;
+			}
+
+			.mobhide {
+				display: none;
+			}
+		}
+	</style>
+<body>
+<div id="header">
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <div class="container">
+        <div class="row header">
+            <div class="two columns"><a href="http://www.villageinn.com" target="_blank"><img class="logo" src="http://image.villageinn-eclub.com/lib/fe8f1372756d05787d/m/1/vi_logo_transparent.png" border="0" /></a></div>
+            <div class="ten columns "><!--<h1>DISCOUNT OFFERS</h1>--></div>
+        </div><!-- End Row -->
+    </div><!-- End Container div -->
+</div><!-- End id header -->
+
+<script>
+	var numbertotal = <ctrl:var name=AS_ALL />;
+	var number_a = <ctrl:var name=AS_AC />;
+	var number_b = <ctrl:var name=AS_UC />;
+	var number_c = <ctrl:var name=AS_BC />;
+	var number_d = <ctrl:var name=AS_HC />;
+
+	var number_a_pct = ((number_a / numbertotal) * 100).toFixed(1) + "%";
+	var number_b_pct = ((number_b / numbertotal) * 100).toFixed(1) + "%";
+	var number_c_pct = ((number_c / numbertotal) * 100).toFixed(1) + "%";
+	var number_d_pct = ((number_d / numbertotal) * 100).toFixed(1) + "%";
+</script>
+
+<script>
+	function numberWithCommas(num) {
+		return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+</script>
+
+<div id="content">
+    <div class="container">
+		<div class="row" style="text-align: center;">
+			<h1>SUBSCRIBERS DASHBOARD</h1>
+		</div>
+		<div class="row" style="margin-bottom: 20px;">
+			<div class="three columns mobhide">&nbsp;</div>
+				<div class="four columns">
+					<div class="chart1 ct-golden-section">
+						<span class="pietotal">
+							<b>Total:</b><br/><script>document.write (numberWithCommas(numbertotal)); </script>
+						</span>
+					</div>
+				</div>
+				<div class="three columns divpieleg">
+					<table class="tablepieleg" width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td width="10%"><div class="square-a"></div></td>
+							<td style="padding-left: 0 !important;"><script>document.write (number_a_pct);</script> Active - (<script>document.write (numberWithCommas(number_a));</script>)</td>
+						</tr>
+						<tr>
+							<td width="10%"><div class="square-b"></div></td>
+							<td style="padding-left: 0 !important;"><script>document.write (number_b_pct);</script> Unsubs - (<script>document.write (numberWithCommas(number_b));</script>)</td>
+						</tr>
+						<tr>
+							<td width="10%"><div class="square-c"></div></td>
+							<td style="padding-left: 0 !important;"><script>document.write (number_c_pct);</script> Bounced - (<script>document.write (numberWithCommas(number_c));</script>)</td>
+						</tr>
+						<tr>
+							<td width="10%"><div class="square-d"></div></td>
+							<td style="padding-left: 0 !important;"><script>document.write (number_d_pct);</script> Held - (<script>document.write (numberWithCommas(number_d));</script>)</td>
+						</tr>
+					</table>
+				</div>
+				<div class="three columns mobhide">&nbsp;</div>
+			</div><!-- End Row -->
+
+			<script>
+				var chart = new Chartist.Pie('.chart1', {
+				  series: [<ctrl:var name=AS_AC />, <ctrl:var name=AS_UC />, <ctrl:var name=AS_BC />, <ctrl:var name=AS_HC />],
+				  labels: ["Active", "Unsubs", "Bounced", "Held"]
+				}, {
+				  donut: true,
+				  showLabel: false
+				});
+			</script>
+
+
+
+
+			<!-- Footable Active Counts by Locations
+			–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+			<table class="footable table" style="border: 3px solid #ED5E11 !important;">
+				<thead>
+					<tr>
+						<th class="footable-visible footable-sortable">Restaurant <i class="fa fa-sort"></i></th>
+						<th class="footable-visible footable-sortable" data-hide="phone">Unit <i class="fa fa-sort"></i></th>
+						<th class="footable-visible footable-sortable" data-hide="phone">Active <i class="fa fa-sort"></i></th>
+						<th class="footable-visible footable-sortable" data-hide="phone">Unsubscribed <i class="fa fa-sort"></i></th>
+						<th class="footable-visible footable-sortable">Total <i class="fa fa-sort"></i></th>
+					</tr>
+				</thead>
+
+				<script language=javascript runat=server>
+
+				  for(var i = 0; i < FavoriteLocationCounts.length; i++){
+					var FL_InternalName = FavoriteLocationCounts[i]["ExternalName"];
+					var FL_FavoriteLocation = FavoriteLocationCounts[i]["FavoriteLocation"];
+					var FL_ALL = FavoriteLocationCounts[i]["AllSubsCount"];
+					var FL_AC = FavoriteLocationCounts[i]["ActiveCount"];
+					var FL_UC = FavoriteLocationCounts[i]["UnsubCount"];
+					var FL_BC = FavoriteLocationCounts[i]["BouncedCount"];
+					var FL_HC = FavoriteLocationCounts[i]["HeldCount"];
+				</script>
+
+				<tr>
+					<td><ctrl:var name=FL_InternalName /></td>
+					<td data-hide="phone"><ctrl:var name=FL_FavoriteLocation /></td>
+					<td data-hide="phone"><ctrl:var name=FL_AC /></td>
+					<td data-hide="phone"><ctrl:var name=FL_UC /></td>
+					<td><ctrl:var name=FL_ALL /></td>
+				</tr>
+
+				<script language=javascript runat=server>
+					}
+				</script>
+
+			</table>
+
+			<br/>
+			<br/>
+    </div><!-- End Container -->
+</div><!-- End Content -->
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>
